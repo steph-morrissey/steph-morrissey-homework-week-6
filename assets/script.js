@@ -1,4 +1,4 @@
-mockCityData = [
+const mockCityData = [
   {
     coord: { lon: 139, lat: 35 },
     weather: [
@@ -41,15 +41,37 @@ mockCityData = [
   },
 ];
 
-recentCitySearches = [];
+let recentCitySearches = [];
 
 function citySearch(city) {
   city.preventDefault();
-
   const citySelection = city.target[0].value;
-  console.log(citySearch);
+  console.log(citySelection);
 }
 
-function recentCitySearch() {}
+function saveCitySearches() {
+  localStorage.setItem(
+    "recentCitySearches",
+    JSON.stringify(recentCitySearches)
+  );
+}
+function displayCitySearches() {
+  recentCitySearches.forEach(function (city) {
+    console.log(city);
+  });
+}
+function addCitySearchesToLocal() {
+  let storedRecentCitySearch = JSON.parse(
+    localStorage.getItem("recentCitySearch")
+  );
 
+  if (storedRecentCitySearch) {
+    recentCitySearch = storedRecentCitySearch;
+  }
+
+  saveCitySearches();
+  displayCitySearches();
+}
+
+addCitySearchesToLocal();
 $("form").submit(citySearch);
