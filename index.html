@@ -30,8 +30,28 @@
     <title>Weather Dashboard</title>
   </head>
   <body>
+    <div class="container-fluid text-center bg-dark text-white mb-2">
+      <h2> Weather Dashboard </h2>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+          <h4>Search for a City:</h4>
+          <form class="form-inline">
+            <div class="form-group mx-sm-3 mb-2">
+              <label for="inputCity" class="sr-only">City Search</label>
+              <input type="text" class="form-control" id="citySearchInput" placeholder="Manchester">
+            </div>
+            <button type="submit" class="btn btn-secondary mb-2">Search</button>
+          </form>
+        </div>
+        <div class="col-md-9">
+
+        </div>
+      </div>
+    </div>
       <!-- Link to JS file -->
-    <script src="./assets/script.js"></script>
+    <script src="assets/script.js"></script>
     <!-- Bootstrap related script tags -->
    <script
   src="https://code.jquery.com/jquery-3.5.0.min.js"
