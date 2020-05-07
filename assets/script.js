@@ -41,13 +41,30 @@ const mockCityData = [
     cod: 200,
   },
 ];
+// Declare ajax querySearch
+let cityName;
 
 let recentCitySearches = [];
 // Function that takes in response from form submission
 function citySearch(city) {
   city.preventDefault();
-  const citySelection = city.target[0].value;
-  console.log(citySelection);
+  const citySearch = city.target[0].value;
+  const cityName = citySearch.toLowerCase();
+  const apiKey = "43c5e9000139b9bdf38b1549672e1492";
+  const queryURL =
+    "https://api.openweathermap.org/data/2.5/weather?q=" +
+    cityName +
+    "&appid=" +
+    apiKey;
+
+  $.ajax({
+    url: queryURL,
+    method: "GET",
+  }).then(example);
+
+  function example(response) {
+    console.log(response);
+  }
 }
 // Add recent searches to localStorage
 function saveCitySearches() {
@@ -73,6 +90,7 @@ function addCitySearchesToLocal() {
   saveCitySearches();
   displayCitySearches();
 }
+
 // Execute set and get to localStorage for recentCitySearch array
 addCitySearchesToLocal();
 // Form event listener
