@@ -1,3 +1,4 @@
+// API mock data for ajax call
 const mockCityData = [
   {
     coord: { lon: 139, lat: 35 },
@@ -42,13 +43,13 @@ const mockCityData = [
 ];
 
 let recentCitySearches = [];
-
+// Function that takes in response from form submission
 function citySearch(city) {
   city.preventDefault();
   const citySelection = city.target[0].value;
   console.log(citySelection);
 }
-
+// Add recent searches to localStorage
 function saveCitySearches() {
   localStorage.setItem(
     "recentCitySearches",
@@ -72,6 +73,7 @@ function addCitySearchesToLocal() {
   saveCitySearches();
   displayCitySearches();
 }
-
+// Execute set and get to localStorage for recentCitySearch array
 addCitySearchesToLocal();
+// Form event listener
 $("form").submit(citySearch);
