@@ -150,21 +150,18 @@ function displayForecastData(city) {
   //uvIndexForecast();
   currentForecast();
   fiveDayForecast();
+  addCitySearch(cityName);
+}
+// Add recent searches to localStorage
+
+function addCitySearch(cityName) {
+  console.log(cityName);
+  recentCitySearches.push(cityName);
+  saveCitySearches();
+  displayCitySearches();
 }
 
-// Add recent searches to localStorage
-function saveCitySearches() {
-  localStorage.setItem(
-    "recentCitySearches",
-    JSON.stringify(recentCitySearches)
-  );
-}
-function displayCitySearches() {
-  recentCitySearches.forEach(function (city) {
-    console.log(city);
-  });
-}
-function addCitySearchesToLocal() {
+function setCitySearchesToLocal() {
   let storedRecentCitySearch = JSON.parse(
     localStorage.getItem("recentCitySearch")
   );
@@ -177,7 +174,23 @@ function addCitySearchesToLocal() {
   displayCitySearches();
 }
 
+function saveCitySearches() {
+  localStorage.setItem(
+    "recentCitySearches",
+    JSON.stringify(recentCitySearches)
+  );
+}
+
+function displayCitySearches() {
+  $("#recentSearches").empty();
+  $("#recentSearches").append("<h4>").text("Your recent searches...");
+  recentCitySearches.forEach(function (city) {
+    $("#recentSearches").append($("<p>").text(city));
+    console.log(city + "yellow");
+  });
+}
+
 // Execute set and get to localStorage for recentCitySearch array
-addCitySearchesToLocal();
+setCitySearchesToLocal();
 // Form event listener
 $("form").submit(displayForecastData);
