@@ -103,11 +103,30 @@ function displayForecastData(city) {
 
   // Function that is executed once data has been received
   function renderCurrentForecast(response) {
-    $("#cityName").text(response.name + " " + currentDate);
-    $("#temperature").text(response.main.temp);
-    $("#humidity").text(response.main.humidity);
-    $("#windTemp").text(response.wind.deg);
-    $("#uvIndex").text(uvIndexData[0].value);
+    const card = $("<div>").attr({
+      class: "card",
+      width: "100%",
+    });
+    const cardBody = $("<div>").addClass("card-body");
+    const cardTitle = $("<h3>")
+      .addClass("card-title")
+      .text(response.name + " " + currentDate);
+    const cardTemp = $("<p>").text("Temperature: " + response.main.temp);
+    const cardHumidity = $("<p>").text("Humidity: " + response.main.humidity);
+    const cardWindTemp = $("<p>").text(
+      "Wind Temperature: " + response.wind.deg
+    );
+    const cardUvIndex = $("<p>").text("UV Index: " + uvIndexData[0].value);
+
+    card.append(cardBody);
+    cardBody.append(
+      cardTitle,
+      cardTemp,
+      cardHumidity,
+      cardWindTemp,
+      cardUvIndex
+    );
+    $("#currentDayForecast").append(card);
   }
 
   function renderFiveDayForecast(response) {
@@ -118,7 +137,7 @@ function displayForecastData(city) {
       const humidity = response.list[i].main.humidity;
 
       console.log(response.list[i].dt_txt);
-      const card = $("<div>").addClass("card");
+      const card = $("<div>").addClass("card my-2");
       const cardBody = $("<div>").addClass("card-body");
       const cardTitle = $("<h5>")
         .addClass("card-title")
