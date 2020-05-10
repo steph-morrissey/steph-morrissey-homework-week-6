@@ -59,34 +59,99 @@ const uvQueryURL =
   "http://api.openweathermap.org/data/2.5/uvi?appid={appid}&lat={lat}&lon={lon}";
 // Empty array for storing recent searches
 let recentCitySearches = [];
-// Function that takes in response from form submission
-function citySearch(city) {
+
+function displayForecastData(city) {
   city.preventDefault();
   // Target users city input and transform to lower case
-  const citySearch = city.target[0].value;
-  const cityName = citySearch.toLowerCase();
-  // API key
+  const selectedCity = city.target[0].value;
+  // Parameters for query search
+  const cityName = selectedCity.toLowerCase();
   const apiKey = "43c5e9000139b9bdf38b1549672e1492";
-  // Query URL which will be used to make ajax call
-  const queryURL =
-    "https://api.openweathermap.org/data/2.5/weather?q=" +
-    cityName +
-    "&appid=" +
-    apiKey;
-  // Ajax call
-  $.ajax({
-    url: queryURL,
-    method: "GET",
-  }).then(renderCurrentWeatherData);
+
+  function currentForecast() {
+    const weatherType = "weather";
+    // Query URL which will be used to make ajax call
+    const queryURL =
+      "https://api.openweathermap.org/data/2.5/" +
+      weatherType +
+      "?q=" +
+      cityName +
+      "&appid=" +
+      apiKey;
+    // Ajax call
+    $.ajax({
+      url: queryURL,
+      method: "GET",
+    }).then(renderCurrentForecast);
+  }
+
+  function fiveDayForecast() {
+    const weatherType = "forecast";
+    const queryURL =
+      "https://api.openweathermap.org/data/2.5/" +
+      weatherType +
+      "?q=" +
+      cityName +
+      "&appid=" +
+      apiKey;
+    // Ajax call
+    $.ajax({
+      url: queryURL,
+      method: "GET",
+    }).then(renderFiveDayForecast);
+  }
+
   // Function that is executed once data has been received
-  function renderCurrentWeatherData(response) {
+  function renderCurrentForecast(response) {
     $("#cityName").text(response.name + " " + currentDate);
     $("#temperature").text(response.main.temp);
     $("#humidity").text(response.main.humidity);
     $("#windTemp").text(response.wind.deg);
     $("#uvIndex").text(uvIndexData[0].value);
   }
+
+  function renderFiveDayForecast(response) {
+    console.log(response);
+    for (i = 0; i < response.list.length; i += 8) {
+      const temp = response.list[i].main.temp;
+      const iconName = response.list[i].weather[0].icon;
+      const humidity = response.list[i].main.humidity;
+
+      console.log(response.list[i].dt_txt);
+      const card = $("<div>").addClass("card");
+      const cardBody = $("<div>").addClass("card-body");
+      const cardTitle = $("<h5>")
+        .addClass("card-title")
+        .text(response.list[i].dt_txt);
+      const iconDiv = $("<img>").attr({
+        src: "http://openweathermap.org/img/w/" + iconName + ".png",
+        alt: "Weather icon",
+        height: "auto",
+        width: "40px",
+      });
+      const secondCardText = $("<p>")
+        .addClass("card-text")
+        .text("Temp: " + temp);
+      const thirdCardText = $("<p>")
+        .addClass("card-text")
+        .text("Humidity: " + humidity);
+      const cardColumn = $("<div>").addClass("col-md-2");
+
+      card
+        .append(cardBody)
+        .append(cardTitle)
+        .append(iconDiv)
+        .append(secondCardText, thirdCardText);
+      cardColumn.append(card);
+      $("#fiveDayForecast").append(cardColumn);
+    }
+  }
+
+  //uvIndexForecast();
+  currentForecast();
+  fiveDayForecast();
 }
+
 // Add recent searches to localStorage
 function saveCitySearches() {
   localStorage.setItem(
@@ -115,4 +180,4 @@ function addCitySearchesToLocal() {
 // Execute set and get to localStorage for recentCitySearch array
 addCitySearchesToLocal();
 // Form event listener
-$("form").submit(citySearch);
+$("form").submit(displayForecastData);
