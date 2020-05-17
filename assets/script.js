@@ -1,215 +1,123 @@
-// API mock data for ajax call
-const mockCityData = [
-  {
-    coord: { lon: -122.08, lat: 37.39 },
-    weather: [
-      {
-        id: 800,
-        main: "Clear",
-        description: "clear sky",
-        icon: "01d",
-      },
-    ],
-    base: "stations",
-    main: {
-      temp: 282.55,
-      feels_like: 281.86,
-      temp_min: 280.37,
-      temp_max: 284.26,
-      pressure: 1023,
-      humidity: 100,
-    },
-    visibility: 16093,
-    wind: {
-      speed: 1.5,
-      deg: 350,
-    },
-    clouds: {
-      all: 1,
-    },
-    dt: 1560350645,
-    sys: {
-      type: 1,
-      id: 5122,
-      message: 0.0139,
-      country: "US",
-      sunrise: 1560343627,
-      sunset: 1560396563,
-    },
-    timezone: -25200,
-    id: 420006353,
-    name: "Mountain View",
-    cod: 200,
-  },
-];
-// API mock data for uv index value
-const uvIndexData = [
-  {
-    lat: 38.75,
-    lon: 40.25,
-    date_iso: "2017-06-23T12:00:00Z",
-    date: 1498219200,
-    value: 10.16,
-  },
-];
-// Variable for current day weather date
-const currentDate = moment().format("(DD/MM/YYYY)");
-// Variable for ajax uvIndex query property
-const uvQueryURL =
-  "http://api.openweathermap.org/data/2.5/uvi?appid={appid}&lat={lat}&lon={lon}";
-// Empty array for storing recent searches
-let recentCitySearches = [];
+// Open weather URL
+OPEN_WEATHER_URL = "https://api.openweathermap.org/data/2.5/";
+// API Key for Open weather API
+API_KEY = "&appid=43c5e9000139b9bdf38b1549672e1492";
+// cityName
+let cityName;
+// Empty array which will be used to store recent searches from localStorage
+let recentSearchesArray = [];
 
-function displayForecastData(city) {
-  city.preventDefault();
-  // Target users city input and transform to lower case
-  const selectedCity = city.target[0].value;
-  // Parameters for query search
-  const cityName = selectedCity.toLowerCase();
-  const apiKey = "43c5e9000139b9bdf38b1549672e1492";
+// Display forecast data for both current and 5 day forecast
+function displayWeatherForecast(cityName) {
+  // Prevent default submit
+  cityName.preventDefault();
+  // Target the city name that the user has searched for
+  const targetCityName = cityName.target[0].value;
+  // Transform the city name to lower case
+  const lowerCaseCityName = targetCityName.toLowerCase();
+  // Make API call to receive data for selected city
+  getWeatherForecast(lowerCaseCityName);
+}
 
-  function currentForecast() {
-    const weatherType = "weather";
-    // Query URL which will be used to make ajax call
-    const queryURL =
-      "https://api.openweathermap.org/data/2.5/" +
-      weatherType +
-      "?q=" +
-      cityName +
-      "&appid=" +
-      apiKey;
-    // Ajax call
-    $.ajax({
-      url: queryURL,
-      method: "GET",
-    }).then(renderCurrentForecast);
-  }
+// Renders current day weather forecast using data received from API call
+function renderCurrentForecast(weatherData) {
+  console.log(weatherData);
+  $("#currentDayForecast").empty();
+  const card = $("<div>").attr({
+    class: "card",
+    width: "100%",
+  });
+  const cardBody = $("<div>").addClass("card-body");
+  const cardTitle = $("<h3>").addClass("card-title").text(weatherData.name);
+  const cardTemp = $("<p>").text("Temperature: " + weatherData.main.temp);
+  const cardHumidity = $("<p>").text("Humidity: " + weatherData.main.humidity);
+  const cardWindTemp = $("<p>").text(
+    "Wind Temperature: " + weatherData.wind.deg
+  );
+  const cardUvIndex = $("<p>").text("UV Index: ");
 
-  function fiveDayForecast() {
-    const weatherType = "forecast";
-    const queryURL =
-      "https://api.openweathermap.org/data/2.5/" +
-      weatherType +
-      "?q=" +
-      cityName +
-      "&appid=" +
-      apiKey;
-    // Ajax call
-    $.ajax({
-      url: queryURL,
-      method: "GET",
-    }).then(renderFiveDayForecast);
-  }
+  card.append(cardBody);
+  cardBody.append(cardTitle, cardTemp, cardHumidity, cardWindTemp, cardUvIndex);
+  $("#currentDayForecast").append(card);
+}
 
-  // Function that is executed once data has been received
-  function renderCurrentForecast(response) {
-    const card = $("<div>").attr({
-      class: "card",
-      width: "100%",
-    });
-    const cardBody = $("<div>").addClass("card-body");
-    const cardTitle = $("<h3>")
-      .addClass("card-title")
-      .text(response.name + " " + currentDate);
-    const cardTemp = $("<p>").text("Temperature: " + response.main.temp);
-    const cardHumidity = $("<p>").text("Humidity: " + response.main.humidity);
-    const cardWindTemp = $("<p>").text(
-      "Wind Temperature: " + response.wind.deg
-    );
-    const cardUvIndex = $("<p>").text("UV Index: " + uvIndexData[0].value);
-
-    card.append(cardBody);
-    cardBody.append(
-      cardTitle,
-      cardTemp,
-      cardHumidity,
-      cardWindTemp,
-      cardUvIndex
-    );
-    $("#currentDayForecast").append(card);
-  }
-
-  function renderFiveDayForecast(response) {
-    console.log(response);
-    for (i = 0; i < response.list.length; i += 8) {
-      const temp = response.list[i].main.temp;
-      const iconName = response.list[i].weather[0].icon;
-      const humidity = response.list[i].main.humidity;
-
-      console.log(response.list[i].dt_txt);
-      const card = $("<div>").addClass("card my-2");
+// Renders 5 day weather forecast using data received from API call
+function renderFiveDayWeatherForecast(weatherData) {
+  $("#fiveDayForecast").empty();
+  // Find first item in weatherData array to get current date
+  const currentDate = weatherData.list[0].dt_txt.slice(8, 10);
+  // Iterates through each item in the weatherData.list array
+  for (i = 0; i < weatherData.list.length; i++) {
+    // Target date in the weatherData.list array for each item
+    const forecastDate = weatherData.list[i].dt_txt.slice(8, 10);
+    // Target timestamp of that date in the weatherData.list array for each item
+    const dateTimestamp = weatherData.list[i].dt_txt.slice(11, 19);
+    // Evaluates whether each item in array is not the current date and if the timestamp is equal to 12:00:00
+    if (forecastDate !== currentDate && dateTimestamp === "12:00:00") {
+      // Target date without the timestamp
+      const date = weatherData.list[i].dt_txt;
+      const cardDate = date.slice(0, 10);
+      // Target temperature
+      const temp = weatherData.list[i].main.temp;
+      // Target weather icon
+      const iconName = weatherData.list[i].weather[0].icon;
+      // Target humidity
+      const humidity = weatherData.list[i].main.humidity;
+      // Create card element with title and body
+      const card = $("<div>").addClass("card bg-warning");
       const cardBody = $("<div>").addClass("card-body");
-      const cardTitle = $("<h5>")
-        .addClass("card-title")
-        .text(response.list[i].dt_txt);
-      const iconDiv = $("<img>").attr({
+      const cardWeatherDate = $("<h5>").addClass("card-title").text(cardDate);
+      const weatherIconDiv = $("<img>").attr({
         src: "http://openweathermap.org/img/w/" + iconName + ".png",
         alt: "Weather icon",
         height: "auto",
         width: "40px",
       });
-      const secondCardText = $("<p>")
+      const cardTemperature = $("<p>")
         .addClass("card-text")
         .text("Temp: " + temp);
-      const thirdCardText = $("<p>")
+      const cardHumidity = $("<p>")
         .addClass("card-text")
         .text("Humidity: " + humidity);
       const cardColumn = $("<div>").addClass("col-md-2");
-
-      card
-        .append(cardBody)
-        .append(cardTitle)
-        .append(iconDiv)
-        .append(secondCardText, thirdCardText);
+      // Append card title and body to the card element
+      card.append(
+        cardBody.append(
+          cardWeatherDate.append(weatherIconDiv, cardTemperature, cardHumidity)
+        )
+      );
+      // Append the card element to the card column
       cardColumn.append(card);
+      // Append the card column to the card body
       $("#fiveDayForecast").append(cardColumn);
     }
   }
-
-  //uvIndexForecast();
-  currentForecast();
-  fiveDayForecast();
-  addCitySearch(cityName);
-}
-// Add recent searches to localStorage
-
-function addCitySearch(cityName) {
-  console.log(cityName);
-  recentCitySearches.push(cityName);
-  saveCitySearches();
-  displayCitySearches();
 }
 
-function setCitySearchesToLocal() {
-  let storedRecentCitySearch = JSON.parse(
-    localStorage.getItem("recentCitySearch")
+// Ajax call options
+function generateAjaxOptions(weatherType, cityName) {
+  const ajaxOptions = {
+    url: OPEN_WEATHER_URL + weatherType + cityName + API_KEY,
+    method: "GET",
+  };
+  //Returns the ajax call options
+  return ajaxOptions;
+}
+
+// Renders forecasts for both current day and five day
+function getWeatherForecast(lowerCaseCityName) {
+  // Variables for weather types for current and 5 day forecast
+  const currentDayWeatherType = "weather?q=";
+  const fiveDayWeatherType = "forecast?q=";
+  // Ajax call for current day forecast
+  $.ajax(generateAjaxOptions(currentDayWeatherType, lowerCaseCityName)).then(
+    renderCurrentForecast
   );
-
-  if (storedRecentCitySearch) {
-    recentCitySearch = storedRecentCitySearch;
-  }
-
-  saveCitySearches();
-  displayCitySearches();
-}
-
-function saveCitySearches() {
-  localStorage.setItem(
-    "recentCitySearches",
-    JSON.stringify(recentCitySearches)
+  // Ajax call for 5 day forecast
+  $.ajax(generateAjaxOptions(fiveDayWeatherType, lowerCaseCityName)).then(
+    renderFiveDayWeatherForecast
   );
 }
 
-function displayCitySearches() {
-  $("#recentSearches").empty();
-  $("#recentSearches").append("<h4>").text("Your recent searches...");
-  recentCitySearches.forEach(function (city) {
-    $("#recentSearches").append($("<p>").text(city));
-    console.log(city + "yellow");
-  });
-}
-
-// Execute set and get to localStorage for recentCitySearch array
-setCitySearchesToLocal();
-// Form event listener
-$("form").submit(displayForecastData);
+// Listens for any city name searches
+$("form").submit(displayWeatherForecast);
