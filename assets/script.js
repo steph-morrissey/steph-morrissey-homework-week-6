@@ -7,6 +7,14 @@ let cityName;
 // Empty array which will be used to store recent searches from localStorage
 let recentSearchesArray = [];
 
+// By default, render most recent search in the recent searches array
+function displayDefaultWeatherForecast() {
+  getFromLocalStorage();
+  // Get last element in the array of recent searches
+  const mostRecentSearch = recentSearchesArray.slice(-1);
+  getWeatherForecast(mostRecentSearch);
+  displayRecentSearches();
+}
 // Display forecast data for both current and 5 day forecast
 function displayWeatherForecast(cityName) {
   // Prevent default submit
@@ -15,8 +23,12 @@ function displayWeatherForecast(cityName) {
   const targetCityName = cityName.target[0].value;
   // Transform the city name to lower case
   const lowerCaseCityName = targetCityName.toLowerCase();
+  // Set this item into localStorage by calling the function
+  setToLocalStorage(lowerCaseCityName);
   // Make API call to receive data for selected city
   getWeatherForecast(lowerCaseCityName);
+  // Display recent weather searches from localStorage beneath the search bar
+  displayRecentSearches();
 }
 
 // Renders current day weather forecast using data received from API call
@@ -94,6 +106,51 @@ function renderFiveDayWeatherForecast(weatherData) {
   }
 }
 
+// Sets city name search to localStorage
+function setToLocalStorage(citySearch) {
+  // Transform lowercase city name to camel case
+  const camelCaseCitySearch = citySearch.replace(/\b[a-z]/g, function (letter) {
+    return letter.toUpperCase();
+  });
+  // Add this item to the recent search array
+  recentSearchesArray.push(camelCaseCitySearch);
+  localStorage.setItem(
+    "recentSearchesArray",
+    JSON.stringify(recentSearchesArray)
+  );
+}
+
+// Get items within the recent searches array from localStorage
+function getFromLocalStorage() {
+  let storedRecentSearchesArray = JSON.parse(
+    localStorage.getItem("recentSearchesArray")
+  );
+
+  if (storedRecentSearchesArray) {
+    recentSearchesArray = storedRecentSearchesArray;
+  }
+  console.log(recentSearchesArray);
+}
+
+// Display most recent searches beneath search bar
+function displayRecentSearches() {
+  console.log("hello");
+  $("#recentSearches").empty();
+  $("#recentSearches").append("<h4>").text("Your recent searches...");
+  const ulElement = $("<div>").addClass("list-group");
+  recentSearchesArray.forEach((city, index) => {
+    ulElement
+      .append($("<a>"))
+      .attr({
+        class: "list-group-item list-group-item-action",
+        id: "list" + index,
+      })
+      .text(city);
+
+    $("#recentSearches").append(ulElement);
+  });
+}
+
 // Ajax call options
 function generateAjaxOptions(weatherType, cityName) {
   const ajaxOptions = {
@@ -119,5 +176,7 @@ function getWeatherForecast(lowerCaseCityName) {
   );
 }
 
+// Display the most recent weather search
+displayDefaultWeatherForecast();
 // Listens for any city name searches
 $("form").submit(displayWeatherForecast);
