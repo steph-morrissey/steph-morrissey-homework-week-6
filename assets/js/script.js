@@ -61,7 +61,6 @@ function calculateUvIndex(weatherData) {
 
 // Targets UV Index value and appends to current day card body
 function uvIndexValue(data) {
-  console.log(data);
   const uvIndexValue = data.value;
   const cardUvIndexP = $("<p>").text("UV Index: ");
   const cardUvIndexSpan = $("<span>").text(uvIndexValue);
@@ -78,7 +77,6 @@ function uvIndexValue(data) {
 
 // Renders 5 day weather forecast using data received from API call
 function renderFiveDayWeatherForecast(weatherData) {
-  console.log(weatherData);
   $("#fiveDayForecast").empty();
   // Find first item in weatherData array to get current date
   const currentDate = weatherData.list[0].dt_txt.slice(8, 10);
