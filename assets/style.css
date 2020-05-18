@@ -1,3 +1,14 @@
-#uvcol {
-  background-color: pink;
+/* Styling for UV Index to show low, moderate or high */
+.lowUv {
+  background-color: #008000;
+  color: #ffffff;
+}
+
+.moderateUv {
+  background-color: #ffff00;
+}
+
+.highUv {
+  background-color: #ff0000;
+  color: #ffffff;
 }

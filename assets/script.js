@@ -33,23 +33,46 @@ function displayWeatherForecast(cityName) {
 
 // Renders current day weather forecast using data received from API call
 function renderCurrentForecast(weatherData) {
+  const uvIndex = calculateUvIndex(weatherData);
   $("#currentDayForecast").empty();
   const card = $("<div>").attr({
     class: "card",
     width: "100%",
   });
-  const cardBody = $("<div>").addClass("card-body");
+  const cardBody = $("<div>").addClass("card-body").attr("id", "cardBody");
   const cardTitle = $("<h3>").addClass("card-title").text(weatherData.name);
   const cardTemp = $("<p>").text("Temperature: " + weatherData.main.temp);
   const cardHumidity = $("<p>").text("Humidity: " + weatherData.main.humidity);
   const cardWindTemp = $("<p>").text(
     "Wind Temperature: " + weatherData.wind.deg
   );
-  const cardUvIndex = $("<p>").text("UV Index: ");
-
   card.append(cardBody);
-  cardBody.append(cardTitle, cardTemp, cardHumidity, cardWindTemp, cardUvIndex);
+  cardBody.append(cardTitle, cardTemp, cardHumidity, cardWindTemp);
   $("#currentDayForecast").append(card);
+}
+
+// Targets latitude and longitude to make Ajax call for UV Index
+function calculateUvIndex(weatherData) {
+  const latitude = weatherData.coord.lat;
+  const longitude = weatherData.coord.lon;
+  const latAndLon = "lat=" + latitude + "&lon=" + longitude;
+  getUvIndexForecast(latAndLon);
+}
+
+// Targets UV Index value and appends to current day card body
+function uvIndexValue(data) {
+  const uvIndexValue = data.value;
+  const cardUvIndexP = $("<p>").text("UV Index: ");
+  const cardUvIndexSpan = $("<span>").text(uvIndexValue);
+  if (parseInt(uvIndexValue) <= 2) {
+    cardUvIndexSpan.addClass("lowUv");
+  } else if (parseInt(uvIndexValue) > 2 && parseInt(uvIndexValue) < 5) {
+    cardUvIndexSpan.addClass("moderateUv");
+  } else {
+    cardUvIndexSpan.addClass("highUv");
+  }
+  const cardUvIndex = cardUvIndexP.append(cardUvIndexSpan);
+  $("#cardBody").append(cardUvIndex);
 }
 
 // Renders 5 day weather forecast using data received from API call
@@ -148,14 +171,16 @@ function displayRecentSearches() {
   $(".searchItems").on("click", renderRecentSearchSelection);
 }
 
+// Renders weather for recent search items if any of them are clicked
 function renderRecentSearchSelection(data) {
+  // Targets the city name of the city that has been clicked
   getWeatherForecast(data.target.text);
 }
 
 // Ajax call options
-function generateAjaxOptions(weatherType, cityName) {
+function generateAjaxOptions(forecastType, weatherType) {
   const ajaxOptions = {
-    url: OPEN_WEATHER_URL + weatherType + cityName + API_KEY,
+    url: OPEN_WEATHER_URL + forecastType + weatherType + API_KEY,
     method: "GET",
   };
   //Returns the ajax call options
@@ -175,6 +200,12 @@ function getWeatherForecast(lowerCaseCityName) {
   $.ajax(generateAjaxOptions(fiveDayWeatherType, lowerCaseCityName)).then(
     renderFiveDayWeatherForecast
   );
+}
+
+function getUvIndexForecast(latAndLon) {
+  const uvIndex = "uvi?";
+  // Ajax call for uv index
+  $.ajax(generateAjaxOptions(uvIndex, latAndLon)).then(uvIndexValue);
 }
 
 // Display the most recent weather search
