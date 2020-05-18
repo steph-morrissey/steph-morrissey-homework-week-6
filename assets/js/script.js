@@ -86,7 +86,7 @@ function renderFiveDayWeatherForecast(weatherData) {
   for (i = 0; i < weatherData.list.length; i++) {
     // Target date in the weatherData.list array for each item
     const forecastDate = weatherData.list[i].dt_txt.slice(8, 10);
-    // Target timestamp of that date in the weatherData.list array for each item
+    // Target timestamp of that dacste in the weatherData.list array for each item
     const dateTimestamp = weatherData.list[i].dt_txt.slice(11, 19);
     // Evaluates whether each item in array is not the current date and if the timestamp is equal to 12:00:00
     if (forecastDate !== currentDate && dateTimestamp === "09:00:00") {
