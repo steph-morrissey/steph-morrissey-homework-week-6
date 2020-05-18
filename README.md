@@ -19,8 +19,9 @@ GitHub Pages: https://steph-morrissey.github.io/steph-morrissey-homework-week-6/
 
 Project is created with:
 
-- Bootstrap: v4.4.1
-- Moment.js: 2.24.0
+- BootstraP v4.4.1: https://getbootstrap.com/
+- Moment.js 2.24.0: https://momentjs.com/
+- OpenWeatherAPI: https://openweathermap.org/
 
 ## How To Use
 
@@ -31,3 +32,7 @@ Project is created with:
 - All recently searched locations will be saved, which you can click on to see that particular city's forecast
 
 ## Screenshots
+
+![weather_dashboard](assets/images/weather_dashboard.png)
+
+- Weather Dashboard displaying both current day and five day weather forecasts
