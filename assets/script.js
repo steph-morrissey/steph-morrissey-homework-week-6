@@ -138,13 +138,18 @@ function displayRecentSearches() {
   recentSearchesArray.forEach((city, index) => {
     const searchItem = $("<a>")
       .attr({
-        class: "list-group-item",
+        class: "list-group-item searchItems",
         id: "list" + index,
       })
       .text(city);
     ulElement.append(searchItem);
   });
   $("#recentSearches").append(ulElement);
+  $(".searchItems").on("click", renderRecentSearchSelection);
+}
+
+function renderRecentSearchSelection(data) {
+  getWeatherForecast(data.target.text);
 }
 
 // Ajax call options
