@@ -61,6 +61,7 @@ function calculateUvIndex(weatherData) {
 
 // Targets UV Index value and appends to current day card body
 function uvIndexValue(data) {
+  console.log(data);
   const uvIndexValue = data.value;
   const cardUvIndexP = $("<p>").text("UV Index: ");
   const cardUvIndexSpan = $("<span>").text(uvIndexValue);
@@ -77,6 +78,7 @@ function uvIndexValue(data) {
 
 // Renders 5 day weather forecast using data received from API call
 function renderFiveDayWeatherForecast(weatherData) {
+  console.log(weatherData);
   $("#fiveDayForecast").empty();
   // Find first item in weatherData array to get current date
   const currentDate = weatherData.list[0].dt_txt.slice(8, 10);
@@ -87,7 +89,7 @@ function renderFiveDayWeatherForecast(weatherData) {
     // Target timestamp of that date in the weatherData.list array for each item
     const dateTimestamp = weatherData.list[i].dt_txt.slice(11, 19);
     // Evaluates whether each item in array is not the current date and if the timestamp is equal to 12:00:00
-    if (forecastDate !== currentDate && dateTimestamp === "12:00:00") {
+    if (forecastDate !== currentDate && dateTimestamp === "09:00:00") {
       // Target date without the timestamp
       const date = weatherData.list[i].dt_txt;
       const cardDate = date.slice(0, 10);
@@ -113,7 +115,7 @@ function renderFiveDayWeatherForecast(weatherData) {
       const cardHumidity = $("<p>")
         .addClass("card-text")
         .text("Humidity: " + humidity);
-      const cardColumn = $("<div>").addClass("col-md-3");
+      const cardColumn = $("<div>").addClass("col-md-2");
       // Append card title and body to the card element
       card.append(
         cardBody.append(
