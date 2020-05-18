@@ -33,7 +33,6 @@ function displayWeatherForecast(cityName) {
 
 // Renders current day weather forecast using data received from API call
 function renderCurrentForecast(weatherData) {
-  console.log(weatherData);
   $("#currentDayForecast").empty();
   const card = $("<div>").attr({
     class: "card",
@@ -91,7 +90,7 @@ function renderFiveDayWeatherForecast(weatherData) {
       const cardHumidity = $("<p>")
         .addClass("card-text")
         .text("Humidity: " + humidity);
-      const cardColumn = $("<div>").addClass("col-md-2");
+      const cardColumn = $("<div>").addClass("col-md-3");
       // Append card title and body to the card element
       card.append(
         cardBody.append(
@@ -129,26 +128,23 @@ function getFromLocalStorage() {
   if (storedRecentSearchesArray) {
     recentSearchesArray = storedRecentSearchesArray;
   }
-  console.log(recentSearchesArray);
 }
 
 // Display most recent searches beneath search bar
 function displayRecentSearches() {
-  console.log("hello");
   $("#recentSearches").empty();
   $("#recentSearches").append("<h4>").text("Your recent searches...");
   const ulElement = $("<div>").addClass("list-group");
   recentSearchesArray.forEach((city, index) => {
-    ulElement
-      .append($("<a>"))
+    const searchItem = $("<a>")
       .attr({
-        class: "list-group-item list-group-item-action",
+        class: "list-group-item",
         id: "list" + index,
       })
       .text(city);
-
-    $("#recentSearches").append(ulElement);
+    ulElement.append(searchItem);
   });
+  $("#recentSearches").append(ulElement);
 }
 
 // Ajax call options
